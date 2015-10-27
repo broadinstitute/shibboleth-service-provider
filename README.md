@@ -36,4 +36,3 @@ docker run -it --rm -p 80:80 -p 443:443 \
   -e SERVER_NAME='FIXME' \
   broadinstitute/shibboleth-service-provider
 ```
-Standard volume mounts (localtime, SSL certificates) should work.
