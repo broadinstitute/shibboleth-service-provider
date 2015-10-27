@@ -22,7 +22,7 @@ docker run --rm -it -v "$PWD":/working broadinstitute/shibboleth-service-provide
   lein cljsbuild auto
 ```
 
-## Continuous Integration
+## Deploying
 
 Steps to build a deployment image:
 ```bash
