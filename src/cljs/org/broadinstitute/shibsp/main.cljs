@@ -32,7 +32,7 @@
   (let [child-process (nodejs/require "child_process")
         fs (nodejs/require "fs")]
     (println "Restarting server...")
-    (.writeHead res 200 (js->clj {"Content-Type" "text/plain"}))
+    (.writeHead res 200 (clj->js {"Content-Type" "text/plain"}))
     (.end res "Server restarting...\n")
     (.readFile fs "/etc/service/app/supervise/pid"
                (fn [err data]
@@ -46,7 +46,7 @@
     (.on
      req "end"
      (fn []
-       (.writeHead res 200 (js->clj {"Content-Type" "text/plain"}))
+       (.writeHead res 200 (clj->js {"Content-Type" "text/plain"}))
        (.end
         res
         (str
@@ -60,7 +60,8 @@
            (str 
             "\n====================\n"
             @body
-            "\n====================\n"))))))))
+            "\n===================="))
+         "\n"))))))
 
 
 (defn- handle-request [req res]
@@ -72,7 +73,7 @@
       (send-info-page req res)
       ;; :else
       #_(do
-        (.writeHead res 404 (js->clj {"Content-Type" "text/plain"}))
+        (.writeHead res 404 (clj->js {"Content-Type" "text/plain"}))
         (.end res "Not Found.\n")))))
 
 
