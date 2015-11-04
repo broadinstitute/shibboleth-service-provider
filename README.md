@@ -9,6 +9,7 @@ The build image looks for the host `shibsp`, so use that name if you want the se
 ```bash
 docker run -it --rm --name shibsp -p 80:80 -p 443:443 \
   -e SERVER_NAME='local.broadinstitute.org' \
+  -e VAULT_TOKEN="$(< ~/.vault-token)" \
   -e DEV='true' -v "$PWD":/working \
   broadinstitute/shibboleth-service-provider
 ```
@@ -33,7 +34,8 @@ docker build -t broadinstitute/shibboleth-service-provider -f src/docker/run/Doc
 # Push docker images.
 # On deployment server:
 docker run -it --rm -p 80:80 -p 443:443 \
-  -e SERVER_NAME='FIXME' \
+  -e SERVER_NAME='fix-me' \
+  -e VAULT_TOKEN='fix-me' \
   broadinstitute/shibboleth-service-provider
 ```
 
