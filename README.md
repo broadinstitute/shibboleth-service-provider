@@ -36,3 +36,22 @@ docker run -it --rm -p 80:80 -p 443:443 \
   -e SERVER_NAME='FIXME' \
   broadinstitute/shibboleth-service-provider
 ```
+
+## Generating Certificates for Shibboleth
+
+**Warning: This will require coordination with NIH's Identity Provider System.**
+
+```bash
+docker run --rm -it -v "$PWD":/working broadinstitute/shibboleth-service-provider shib-keygen -o .
+```
+
+This will generate `sp-cert.pem` and `sp-key.pem` in $PWD.
+
+```bash
+export NIH_ENV=dev # dev or prod NIH environment
+docker run -it -e VAULT_ADDR='https://clotho.broadinstitute.org:8200' -v "$HOME":/root \
+  -v "$PWD":/working \
+  broadinstitute/dsde-toolbox \
+  vault write secret/dsde/shibboleth-service-provider/shibboleth-cert/$NIH_ENV \
+  cert-pem=@sp-cert.pem key-pem=@sp-key.pem
+```

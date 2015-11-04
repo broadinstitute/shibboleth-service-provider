@@ -2,10 +2,13 @@
   (:require
    [cljs.nodejs :as nodejs]
    cljs.pprint
+   clojure.string
    ))
 
 (def fs (nodejs/require "fs"))
 (def http (nodejs/require "http"))
+
+(def jwt (nodejs/require "jsonwebtoken"))
 
 
 (nodejs/enable-util-print!)
@@ -40,39 +43,50 @@
                  (.spawn child-process "kill" (clj->js [(js/parseInt data)]))))))
 
 
+(defn- redirect-with-token [req res]
+  (let [nih-username (aget (.-headers req) "x-nih-username")
+        nih-username (when nih-username (clojure.string/trim nih-username))
+        nih-username (if (clojure.string/blank? nih-username) nil nih-username)
+        redirect-url (-> js/process .-env .-REDIRECT_URL)]
+    (if (nil? nih-username)
+      (do
+        (.writeHead res 400 (clj->js {"Content-Type" "text/plain"}))
+        (.end res "Username not provided.\n"))
+      (do
+        (.writeHead
+         res 303
+         (clj->js
+          {"Location"
+           (clojure.string/replace
+            redirect-url
+            "{token}"
+            (.sign jwt nih-username (-> js/process .-env .-SIGNING_SECRET)))}))
+        (.end res)))))
+
+
 (defn- send-info-page [req res]
-  (let [body (atom "")]
-    (.on req "data" (fn [chunk] (swap! body str chunk)))
-    (.on
-     req "end"
-     (fn []
-       (.writeHead res 200 (clj->js {"Content-Type" "text/plain"}))
-       (.end
-        res
-        (str
-         "Hello.\n"
-         (.-method req) " " (.-url req) "\n"
-         "Request headers were:\n"
-         (JSON.stringify (.-headers req) nil 2) "\n"
-         "Request body was:"
-         (if (zero? (.-length @body))
-           " (empty)"
-           (str 
-            "\n====================\n"
-            @body
-            "\n===================="))
-         "\n"))))))
+  (.writeHead res 200 (clj->js {"Content-Type" "text/html"}))
+  (.end
+   res
+   (str
+    "<html><head>Shibboleth Authentication Service</head>"
+    "<body>"
+    "<p>To authenticate, visit:</p>"
+    "<a href=\"/link-nih-account\">/link-nih-account</a>"
+    "</body>"
+    "</html>"
+    "\n")))
 
 
 (defn- handle-request [req res]
   (let [url (.-url req)]
     (cond
+      (= url "/") (send-info-page req res)
       (and (= (-> js/process .-env .-DEV) "true") (= url "/restart"))
       (restart-server req res)
+      (= url "/link-nih-account") (redirect-with-token req res)
       :else
-      (send-info-page req res)
-      ;; :else
-      #_(do
+      (do
         (.writeHead res 404 (clj->js {"Content-Type" "text/plain"}))
         (.end res "Not Found.\n")))))
 

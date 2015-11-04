@@ -7,34 +7,32 @@ RUN true \
     apache2 \
     libapache2-mod-shib2 \
     nodejs \
+    unzip \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN curl https://releases.hashicorp.com/vault/0.3.1/vault_0.3.1_linux_amd64.zip > /tmp/vault.zip \
+  && unzip /tmp/vault.zip -d /bin && rm /tmp/vault.zip
 
 # This is the default, but it must be declared to use it:
 ENV NODE_PATH='/usr/lib/node_modules'
 
-RUN npm install -g source-map-support
+RUN npm install -g jsonwebtoken source-map-support
 
 # Apache Config
-# Generate a certificate for local development.
-RUN curl -L \
-  'https://raw.githubusercontent.com/broadinstitute/dockerfiles/master/apache-proxy/ca-bundle.crt' \
-  > /etc/ssl/certs/ca-bundle.crt
-RUN openssl req -newkey rsa:4096 -days 365 -nodes -x509 \
-    -subj '/C=US/ST=Massachusetts/L=Cambridge/O=Broad Institute/OU=BITS DevOps/CN=localhost/emailAddress=devops@broadinstitute.org' \
-    -keyout /etc/ssl/private/server.key \
-    -out /etc/ssl/certs/server.crt
 # Disable default site
 RUN a2dissite 000-default
 # Enable custom site
 COPY src/docker/run/apache-site.conf /etc/apache2/sites-available/site.conf
 RUN a2ensite site
 # Enable required modules
-RUN a2enmod proxy proxy_http ssl
+RUN a2enmod proxy proxy_http ssl headers
 COPY src/docker/run/apache-run.sh /etc/service/apache/run
 COPY src/docker/run/shibboleth2.xml /etc/shibboleth/shibboleth2.xml
+COPY src/docker/run/attribute-map.xml /etc/shibboleth/attribute-map.xml
 COPY src/docker/run/shibboleth-run.sh /etc/service/shibboleth/run
 # Idp metadata available at https://this-host/Shibboleth.sso/Metadata
 
+RUN mkdir /env
 RUN mkdir /working
 WORKDIR /working
 
@@ -43,4 +41,13 @@ COPY target target
 
 EXPOSE 80 443
 
+ENV VAULT_ADDR='https://clotho.broadinstitute.org:8200'
+ENV VAULT_ROOT='secret/dsde/shibboleth-service-provider'
+ENV VAULT_TOKEN=fix-me
 ENV SERVER_ADMIN='devops@broadinstitute.org'
+# Used for $VAULT_ROOT/ssl-certs/$SERVER_NAME secrets.
+ENV SERVER_NAME=fix-me
+# Used for $VAULT_ROOT/shibboleth-cert/$NIH_ENV secrets.
+ENV NIH_ENV=dev
+# Used for $VAULT_ROOT/signing/$SIGNING_KEY secrets.
+ENV SIGNING_KEY=dev
