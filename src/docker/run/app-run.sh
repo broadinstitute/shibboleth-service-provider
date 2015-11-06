@@ -4,9 +4,9 @@ IFS=$'\n\t'
 
 if [ ! -e /env/signing.env ]; then
   TMP='/tmp/signing.env'
-  VALUE="$(vault read -field=secret $VAULT_ROOT/signing/$SIGNING_KEY)"
+  VALUE="$(vault read -field=secret $VAULT_ROOT/signing/$SERVER_NAME)"
   echo "export SIGNING_SECRET='$VALUE'" >> "$TMP"
-  VALUE="$(vault read -field=redirect-url $VAULT_ROOT/signing/$SIGNING_KEY)"
+  VALUE="$(vault read -field=redirect-url $VAULT_ROOT/signing/$SERVER_NAME)"
   echo -n "export REDIRECT_URL='$VALUE'" >> "$TMP"
   mv "$TMP" /env/signing.env
 fi

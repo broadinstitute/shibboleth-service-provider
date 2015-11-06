@@ -45,9 +45,7 @@ ENV VAULT_ADDR='https://clotho.broadinstitute.org:8200'
 ENV VAULT_ROOT='secret/dsde/shibboleth-service-provider'
 ENV VAULT_TOKEN=fix-me
 ENV SERVER_ADMIN='devops@broadinstitute.org'
-# Used for $VAULT_ROOT/ssl-certs/$SERVER_NAME secrets.
+# Used for $VAULT_ROOT/ssl-certs/$SERVER_NAME and $VAULT_ROOT/signing/$SERVER_NAME secrets.
 ENV SERVER_NAME=fix-me
 # Used for $VAULT_ROOT/shibboleth-cert/$NIH_ENV secrets.
 ENV NIH_ENV=dev
-# Used for $VAULT_ROOT/signing/$SIGNING_KEY secrets.
-ENV SIGNING_KEY=dev
