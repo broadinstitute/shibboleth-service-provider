@@ -47,7 +47,7 @@
   (let [nih-username (aget (.-headers req) "x-nih-username")
         nih-username (when nih-username (clojure.string/trim nih-username))
         nih-username (if (clojure.string/blank? nih-username) nil nih-username)
-        redirect-url (-> js/process .-env .-REDIRECT_URL)]
+        redirect-url (-> js/process .-env .-SERVER_NAME)]
     (if (nil? nih-username)
       (do
         (.writeHead res 400 (clj->js {"Content-Type" "text/plain"}))

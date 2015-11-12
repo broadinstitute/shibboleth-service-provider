@@ -12,11 +12,16 @@ RUN true \
 
 RUN curl https://releases.hashicorp.com/vault/0.3.1/vault_0.3.1_linux_amd64.zip > /tmp/vault.zip \
   && unzip /tmp/vault.zip -d /bin && rm /tmp/vault.zip
+RUN curl -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 > \
+  /usr/local/bin/jq \
+  && chmod +x /usr/local/bin/jq
 
 # This is the default, but it must be declared to use it:
 ENV NODE_PATH='/usr/lib/node_modules'
-
 RUN npm install -g jsonwebtoken source-map-support
+
+COPY src/docker/run/apply-config.sh /etc/my_init.d/apply-config.sh
+COPY src/docker/run/fetch-vault-configs.sh /usr/local/bin/fetch-vault-configs
 
 # Apache Config
 # Disable default site
@@ -32,7 +37,6 @@ COPY src/docker/run/attribute-map.xml /etc/shibboleth/attribute-map.xml
 COPY src/docker/run/shibboleth-run.sh /etc/service/shibboleth/run
 # Idp metadata available at https://this-host/Shibboleth.sso/Metadata
 
-RUN mkdir /env
 RUN mkdir /working
 WORKDIR /working
 
@@ -42,10 +46,5 @@ COPY target target
 EXPOSE 80 443
 
 ENV VAULT_ADDR='https://clotho.broadinstitute.org:8200'
-ENV VAULT_ROOT='secret/dsde/shibboleth-service-provider'
-ENV VAULT_TOKEN=fix-me
-ENV SERVER_ADMIN='devops@broadinstitute.org'
-# Used for $VAULT_ROOT/ssl-certs/$SERVER_NAME and $VAULT_ROOT/signing/$SERVER_NAME secrets.
-ENV SERVER_NAME=fix-me
-# Used for $VAULT_ROOT/shibboleth-cert/$NIH_ENV secrets.
-ENV NIH_ENV=dev
+ENV VAULT_ROOT='secret/dsde'
+ENV VAULT_PROJECT_NAME='shibboleth'

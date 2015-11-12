@@ -1,6 +1,16 @@
 # Shibboleth Service Provider
 
-A generic Shibboleth service provider service for use in Shibboleth authentication schemes.
+A generic Shibboleth service provider service for use in Shibboleth authentication schemes (e.g. NIH).
+
+## Configuration
+
+Copy `src/docker/run/config-example.json` `target/config/config.json` and modify for your environment. Run the container to see additional configuration requirements. If you're using Vault, you can generate secrets using this command:
+```bash
+docker run --rm -v "$PWD":/working broadinstitute/shibboleth-service-provider \
+  fetch-vault-configs <vault-token> <environment-name>
+```
+* `vault-token`: usually "$(<~/.vault-token)"
+* `environment-name`: `dev` or `prod`
 
 ## Running for Development
 
@@ -8,8 +18,6 @@ The build image looks for the host `shibsp`, so use that name if you want the se
 
 ```bash
 docker run -it --rm --name shibsp -p 80:80 -p 443:443 \
-  -e SERVER_NAME='local.broadinstitute.org' \
-  -e VAULT_TOKEN="$(< ~/.vault-token)" \
   -e DEV='true' -v "$PWD":/working \
   broadinstitute/shibboleth-service-provider
 ```
@@ -32,10 +40,9 @@ docker run --rm -it -v "$PWD":/working broadinstitute/shibboleth-service-provide
   lein cljsbuild once
 docker build -t broadinstitute/shibboleth-service-provider -f src/docker/run/Dockerfile .
 # Push docker images.
-# On deployment server:
+# On deployment server, follow the "Configuration" instructions, then:
 docker run -it --rm -p 80:80 -p 443:443 \
-  -e SERVER_NAME='fix-me' \
-  -e VAULT_TOKEN='fix-me' \
+  -v "$PWD"/target:/working/target
   broadinstitute/shibboleth-service-provider
 ```
 
@@ -48,12 +55,3 @@ docker run --rm -it -v "$PWD":/working broadinstitute/shibboleth-service-provide
 ```
 
 This will generate `sp-cert.pem` and `sp-key.pem` in $PWD.
-
-```bash
-export NIH_ENV=dev # dev or prod NIH environment
-docker run -it -e VAULT_ADDR='https://clotho.broadinstitute.org:8200' -v "$HOME":/root \
-  -v "$PWD":/working \
-  broadinstitute/dsde-toolbox \
-  vault write secret/dsde/shibboleth-service-provider/shibboleth-cert/$NIH_ENV \
-  cert-pem=@sp-cert.pem key-pem=@sp-key.pem
-```

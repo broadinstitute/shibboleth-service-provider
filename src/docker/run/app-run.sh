@@ -2,16 +2,9 @@
 set -euox pipefail
 IFS=$'\n\t'
 
-if [ ! -e /env/signing.env ]; then
-  TMP='/tmp/signing.env'
-  VALUE="$(vault read -field=secret $VAULT_ROOT/signing/$SERVER_NAME)"
-  echo "export SIGNING_SECRET='$VALUE'" >> "$TMP"
-  VALUE="$(vault read -field=redirect-url $VAULT_ROOT/signing/$SERVER_NAME)"
-  echo -n "export REDIRECT_URL='$VALUE'" >> "$TMP"
-  mv "$TMP" /env/signing.env
-fi
-
-source /env/signing.env
+config='/working/target/config/config.json'
+export SERVER_NAME="$(jq '.serverName' $config | tr -d '\"')"
+export SIGNING_SECRET="$(jq '.signingSecret' $config | tr -d '\"')"
 
 exec node <<EOF
 require("source-map-support").install();
