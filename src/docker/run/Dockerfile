@@ -47,5 +47,4 @@ RUN a2ensite site \
   && chmod 0755 /etc/service/apache/run \
   && chmod 0755 /etc/service/shibboleth/run \
   && chmod 0755 /etc/service/app/run \
-  && mkdir -p /working/target/config \
-  && echo '{"serverName": the-servername}' > /working/target/config/config.js
+  && mkdir -p /working/target/config
