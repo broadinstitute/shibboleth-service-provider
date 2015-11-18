@@ -28,6 +28,8 @@ RUN true \
   && mkdir /working \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+WORKDIR /working
+
 COPY src/docker/run/apply-config.sh /etc/my_init.d/apply-config.sh
 COPY src/docker/run/fetch-vault-configs.sh /usr/local/bin/fetch-vault-configs
 COPY src/docker/run/apache-site.conf /etc/apache2/sites-available/site.conf
@@ -47,5 +49,3 @@ RUN a2ensite site \
   && chmod 0755 /etc/service/app/run \
   && mkdir -p /working/target/config \
   && echo '{"serverName": the-servername}' > /working/target/config/config.js
-
-WORKDIR /working
