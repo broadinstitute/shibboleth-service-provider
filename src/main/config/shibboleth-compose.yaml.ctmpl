@@ -1,0 +1,11 @@
+{{with $environment := env "ENVIRONMENT"}}{{$keyname := printf "secret/dsde/%s/shibboleth/shibboleth-compose.yaml" $environment}}{{with vault $keyname}}
+app:
+  image: {{.Data.app_image}}:{{.Data.app_tag}}
+  environment:
+    SERVER_ADMIN: {{.Data.server_admin}}  
+  ports:
+{{if .Data.http_port}}    - "{{.Data.http_port}}"{{end}}
+{{if .Data.https_port}}    - "{{.Data.https_port}}"{{end}}
+  volumes:
+{{if .Data.localtime}}    - {{.Data.localtime}}{{end}}
+{{if .Data.target}}    - {{.Data.target}}{{end}}{{end}}{{end}}
