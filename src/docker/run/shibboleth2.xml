@@ -41,7 +41,7 @@
             (Set discoveryProtocol to "WAYF" for legacy Shibboleth WAYF support.)
             You can also override entityID on /Login query string, or in RequestMap/htaccess.
             -->
-            <SSO entityID="https://citdecadssoweb.cit.nih.gov/SAML2/IDP"
+            <SSO entityID="--IDP_ENTITY_ID--"
                  discoveryProtocol="SAMLDS"
                  discoveryURL="--IDP_METADATA_URL--">
               SAML2 SAML1
@@ -74,7 +74,7 @@
         <MetadataProvider
             type="XML"
             uri="--IDP_METADATA_URL--"
-            backingFilePath="--BACKING_FILE_PATH--" reloadInterval="180000" />
+            backingFilePath="saml2-nih-itrust-idp.xml" reloadInterval="180000" />
         <!-- Example of remotely supplied batch of signed metadata. -->
         <!--
         <MetadataProvider type="XML" uri="http://federation.org/federation-metadata.xml"
