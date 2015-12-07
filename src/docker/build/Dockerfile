@@ -23,4 +23,5 @@ WORKDIR /working
 COPY project.clj /working/project.clj
 
 # Download deps and plugins.
+ENV APP_HOST=notahost
 RUN lein cljsbuild once
