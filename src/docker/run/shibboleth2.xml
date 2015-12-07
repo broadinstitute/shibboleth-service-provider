@@ -74,7 +74,7 @@
         <MetadataProvider
             type="XML"
             uri="--IDP_METADATA_URL--"
-            backingFilePath="saml2-nih-itrust-idp.xml" reloadInterval="180000" />
+            backingFilePath="--BACKING_FILE_PATH--" reloadInterval="180000" />
         <!-- Example of remotely supplied batch of signed metadata. -->
         <!--
         <MetadataProvider type="XML" uri="http://federation.org/federation-metadata.xml"

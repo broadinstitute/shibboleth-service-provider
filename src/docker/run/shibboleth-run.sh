@@ -8,10 +8,12 @@ mkdir -p /var/run/shibboleth
 config='/working/target/config/config.json'
 SERVER_NAME="$(jq '.serverName' $config | tr -d '\"')"
 IDP_METADATA_URL="$(jq '.idpMetadataUrl' $config | tr -d '\"')"
+BACKING_FILE_PATH="$(basename $IDP_METADATA_URL)"
 
 SHIB_XML=$(< /etc/shibboleth/shibboleth2.xml)
 SHIB_XML=${SHIB_XML//'--SERVER_NAME--'/"$SERVER_NAME"}
 SHIB_XML=${SHIB_XML//'--IDP_METADATA_URL--'/"$IDP_METADATA_URL"}
+SHIB_XML=${SHIB_XML//'--BACKING_FILE_PATH--'/"$BACKING_FILE_PATH"}
 echo "$SHIB_XML" > /etc/shibboleth/shibboleth2.xml
 
 exec /usr/sbin/shibd -F -f
