@@ -14,20 +14,21 @@ docker run --rm -v "$PWD":/working broadinstitute/shibboleth-service-provider \
 
 ## Running for Development
 
-The build image looks for the host `shibsp`, so use that name if you want the server to automatically restart whenever a build completes. `DEV=true` exposes the `/restart` endpoint for server restarting.
+`DEV=true` exposes the `/restart` endpoint for server restarting.
 
 ```bash
-docker run -it --rm --name shibsp -p 80:80 -p 443:443 \
+docker run -it --rm --name shib -p 80:80 -p 443:443 \
   -e DEV='true' -v "$PWD":/working \
   broadinstitute/shibboleth-service-provider
 ```
 
 ## Building
 
-`lein cljsbuild auto` will rebuild whenever files are changed and restart the server if it is running at the host `shibsp`.
+`lein cljsbuild auto` will rebuild whenever files are changed and restart the server by calling `https://$APP_HOST/restart`.
 
 ```bash
-docker run --rm -it -v "$PWD":/working broadinstitute/shibboleth-service-provider-build \
+docker run --rm -it -v "$PWD":/working -e APP_HOST=shib \
+  broadinstitute/shibboleth-service-provider-build \
   lein cljsbuild auto
 ```
 

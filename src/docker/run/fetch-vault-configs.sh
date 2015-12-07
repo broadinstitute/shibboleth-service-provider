@@ -4,6 +4,11 @@ IFS=$'\n\t'
 
 export VAULT_TOKEN="$1"
 env_name="$2"
+if [ "$env_name"='prod' ]; then
+  idp_metadata_url='http://citdecadssoweb.cit.nih.gov/saml2/idp/saml2-nih-itrustprod-idp.xml'
+else
+  idp_metadata_url='http://citdecadssoweb.cit.nih.gov/saml2/idp/saml2-nih-itrustdev-idp.xml'
+fi
 secret_path="$VAULT_ROOT/$env_name/$VAULT_PROJECT_NAME"
 
 if [ ! -e /working/target/config/config.json ]; then
@@ -13,7 +18,10 @@ fi
 
 echo $(vault read -format=json "$secret_path/signing-secret") \
   $(< /working/target/config/config.json) \
-  | jq -s '.[1] * {signingSecret: .[0].data.value}'
+  | jq -s ".[1] * {signingSecret: .[0].data.value, idpMetadataUrl: \"$idp_metadata_url\"}" \
+  > /working/target/config/config.new.json \
+  && mv /working/target/config/config.new.json /working/target/config/config.json     
+
 vault read -field=chain "secret/common/ca-bundle.crt" > /working/target/config/ca-bundle.crt
 vault read -field=value "$secret_path/sp-cert.pem" > /working/target/config/sp-cert.pem
 vault read -field=value "$secret_path/sp-key.pem" > /working/target/config/sp-key.pem

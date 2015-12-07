@@ -7,7 +7,9 @@
 
 (def fs (nodejs/require "fs"))
 (def http (nodejs/require "http"))
+(def url (nodejs/require "url"))
 
+(def Cookies (nodejs/require "cookies"))
 (def jwt (nodejs/require "jsonwebtoken"))
 
 
@@ -43,11 +45,29 @@
                  (.spawn child-process "kill" (clj->js [(js/parseInt data)]))))))
 
 
+(defn- set-cookie-and-redirect [req res]
+  (let [parsed-url (.parse url (.-url req) true)
+        redirect-url (aget (.-query parsed-url) "redirect-url")
+        redirect-url (when redirect-url (clojure.string/trim redirect-url))
+        redirect-url (when-not (clojure.string/blank? redirect-url) redirect-url)]
+    (if-not redirect-url
+      (do
+        (.writeHead res 400)
+        (.end res "Missing redirect-url parameter."))
+      (do
+        (.set (Cookies. req res) "redirect-url" redirect-url)
+        (.writeHead
+         res 303
+         (clj->js
+          {"Location" "/login-and-redirect"}))
+        (.end res)))))
+
+
 (defn- redirect-with-token [req res]
   (let [nih-username (aget (.-headers req) "x-nih-username")
         nih-username (when nih-username (clojure.string/trim nih-username))
         nih-username (if (clojure.string/blank? nih-username) nil nih-username)
-        redirect-url (-> js/process .-env .-SERVER_NAME)]
+        redirect-url (.get (Cookies. req res) "redirect-url")]
     (if (nil? nih-username)
       (do
         (.writeHead res 400 (clj->js {"Content-Type" "text/plain"}))
@@ -64,15 +84,24 @@
         (.end res)))))
 
 
+(defn- auth-completed-example [req res]
+  (.writeHead res 200)
+  (.end res "Parse the token in this URL to verify username."))
+
+
 (defn- send-info-page [req res]
   (.writeHead res 200 (clj->js {"Content-Type" "text/html"}))
   (.end
    res
    (str
-    "<html><head>Shibboleth Authentication Service</head>"
+    "<html>"
+    "<head><title>Shibboleth Authentication Service</title></head>"
     "<body>"
     "<p>To authenticate, visit:</p>"
-    "<a href=\"/link-nih-account\">/link-nih-account</a>"
+    "<a href=\"/link-nih-account?redirect-url="
+    (js/encodeURIComponent (str "https://" (-> js/process .-env .-SERVER_NAME)
+                                "/auth-completed-example?token={token}"))
+    "\">/link-nih-account</a>"
     "</body>"
     "</html>"
     "\n")))
@@ -84,7 +113,9 @@
       (= url "/") (send-info-page req res)
       (and (= (-> js/process .-env .-DEV) "true") (= url "/restart"))
       (restart-server req res)
-      (= url "/link-nih-account") (redirect-with-token req res)
+      (re-find #"^/link-nih-account" url) (set-cookie-and-redirect req res)
+      (= url "/login-and-redirect") (redirect-with-token req res)
+      (re-find #"^/auth-completed-example" url) (auth-completed-example req res)
       :else
       (do
         (.writeHead res 404 (clj->js {"Content-Type" "text/plain"}))

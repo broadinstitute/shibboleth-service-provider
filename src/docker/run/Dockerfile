@@ -22,7 +22,7 @@ RUN true \
   && unzip /tmp/vault.zip -d /bin && rm /tmp/vault.zip \
   && curl -o /usr/local/bin/jq -L https://github.com/stedolan/jq/releases/download/jq-${JQ_VERSION}/jq-linux64 \
   && chmod +x /usr/local/bin/jq \
-  && npm install -g jsonwebtoken source-map-support \
+  && npm install -g cookies jsonwebtoken source-map-support \
   && a2dissite 000-default \
   && a2enmod proxy proxy_http ssl headers \
   && mkdir /working \

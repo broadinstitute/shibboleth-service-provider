@@ -42,7 +42,8 @@
             You can also override entityID on /Login query string, or in RequestMap/htaccess.
             -->
             <SSO entityID="https://citdecadssoweb.cit.nih.gov/SAML2/IDP"
-                 discoveryProtocol="SAMLDS" discoveryURL="http://citdecadssoweb.cit.nih.gov/saml2/idp/saml2-nih-itrustdev-idp.xml">
+                 discoveryProtocol="SAMLDS"
+                 discoveryURL="--IDP_METADATA_URL--">
               SAML2 SAML1
             </SSO>
 
@@ -72,8 +73,8 @@
         
         <MetadataProvider
             type="XML"
-            uri="http://citdecadssoweb.cit.nih.gov/saml2/idp/saml2-nih-itrustdev-idp.xml"
-            backingFilePath="saml2-nih-itrustdev-idp.xml" reloadInterval="180000" />
+            uri="--IDP_METADATA_URL--"
+            backingFilePath="saml2-nih-itrust-idp.xml" reloadInterval="180000" />
         <!-- Example of remotely supplied batch of signed metadata. -->
         <!--
         <MetadataProvider type="XML" uri="http://federation.org/federation-metadata.xml"
