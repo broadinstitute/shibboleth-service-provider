@@ -5,7 +5,7 @@ IFS=$'\n\t'
 export VAULT_TOKEN="$1"
 env_name="$2"
 if [ "$env_name" == 'prod' ]; then
-  idp_metadata_url='http://citdecadssoweb.cit.nih.gov/saml2/idp/saml2-nih-itrustprod-idp.xml'
+  idp_metadata_url='https://authdev.nih.gov/saml2/idp/saml2-nih-wamprod-idp.xml'
   idp_entity_id='https://itrusteauth.nih.gov/IDP'
 else
   idp_metadata_url='http://citdecadssoweb.cit.nih.gov/saml2/idp/saml2-nih-itrustdev-idp.xml'
