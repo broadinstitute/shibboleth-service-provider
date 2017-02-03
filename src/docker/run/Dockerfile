@@ -1,4 +1,4 @@
-FROM phusion/baseimage:0.9.17
+FROM phusion/baseimage:0.9.19
 
 ENV DEBIAN_FRONTEND=noninteractive \
   JQ_VERSION=1.5 \
