@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<EntityDescriptor entityID="https://auth.nih.gov/IDP" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
+    <IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <KeyDescriptor use="signing">
+            <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+                <ds:X509Data>
+                    <ds:X509Certificate>
+MIIFxTCCBK2gAwIBAgIEUVCrejANBgkqhkiG9w0BAQsFADB/MQswCQYDVQQGEwJV
+UzEYMBYGA1UEChMPVS5TLiBHb3Zlcm5tZW50MQwwCgYDVQQLEwNISFMxIjAgBgNV
+BAsTGUNlcnRpZmljYXRpb24gQXV0aG9yaXRpZXMxJDAiBgNVBAMTG0hIUy1GUEtJ
+LUludGVybWVkaWF0ZS1DQS1FMTAeFw0xNzAxMDYxNTIwMThaFw0xOTA1MDkxNDAy
+MzFaMHwxCzAJBgNVBAYTAlVTMRgwFgYDVQQKEw9VLlMuIEdvdmVybm1lbnQxDDAK
+BgNVBAsTA0hIUzEMMAoGA1UECxMDTklIMRAwDgYDVQQLEwdEZXZpY2VzMSUwIwYD
+VQQDExx3YW1zaWduaW5nZmVkZXJhdGlvbi5uaWguZ292MIIBIjANBgkqhkiG9w0B
+AQEFAAOCAQ8AMIIBCgKCAQEAqaxxwZM7+fly9jppV0ToyRRUP+IfsKhRPKsNNvPI
+g9UA06F1TcB7Z3GrNaxv+awkvIPZIMNCa0gs88DybOYBBe09mJrFsr0GRlgdJuNg
+QAsXYuG/SEYmz9AnhMAKKhIOgdoPHGP5wqArqXXLN9ui8jf193PIpbEj5jpmPjKl
+olzBEgIbtHn2ywQbuFeysVVYaTk/pQDtmM52CIZX/90HSIHKhSMJBp4+83ayuNXV
+ViEa6EdyeMiBDpL6UWehQnL6gsFW0fIndWbO4l9RIEmCAoxUzaJwwYy46GH9Lm1p
+3/aTa/cyJl2uIi82MaY8bhMsdflGRT/NLnfgytItLHmFDQIDAQABo4ICSjCCAkYw
+DgYDVR0PAQH/BAQDAgWgMBcGA1UdIAQQMA4wDAYKYIZIAWUDAgEDCDCBywYIKwYB
+BQUHAQEEgb4wgbswUgYIKwYBBQUHMAKGRmh0dHA6Ly9oaHNwa2ljcmwubWFuYWdl
+ZC5lbnRydXN0LmNvbS9BSUEvQ2VydHNJc3N1ZWRUb0hIU0VudHJ1c3RDQS5wN2Mw
+IAYIKwYBBQUHMAGGFGh0dHA6Ly9vY3NwLmRoaHMuZ292MEMGCCsGAQUFBzABhjdo
+dHRwOi8vaGhzcGtpb2NzcC5tYW5hZ2VkLmVudHJ1c3QuY29tL09DU1AvSEhTRW50
+cnVzdENBMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjCB7QYDVR0fBIHl
+MIHiMECgPqA8hjpodHRwOi8vaGhzcGtpY3JsLm1hbmFnZWQuZW50cnVzdC5jb20v
+Q1JMcy9ISFNFbnRydXN0Q0EuY3JsMIGdoIGaoIGXpIGUMIGRMQswCQYDVQQGEwJV
+UzEYMBYGA1UEChMPVS5TLiBHb3Zlcm5tZW50MQwwCgYDVQQLEwNISFMxIjAgBgNV
+BAsTGUNlcnRpZmljYXRpb24gQXV0aG9yaXRpZXMxJDAiBgNVBAMTG0hIUy1GUEtJ
+LUludGVybWVkaWF0ZS1DQS1FMTEQMA4GA1UEAxMHQ1JMMTg3OTAfBgNVHSMEGDAW
+gBRN1aomng5IvuVGLPjhAHQI+vZDRDAdBgNVHQ4EFgQUr5+zdQkeBhz2QSwsf7wh
+RvaKumAwDQYJKoZIhvcNAQELBQADggEBAEdCpbn9VLUSjt2nTzz2dWFl3kBp6ZX6
+z+QgBDjp2EZnKhYYS2l2LtnRN481S+werk+T2iHIWZmwDaNw9zHTERgjmjTKBxbg
+9k8zEN2hsyALNJL9gjONJ591VcB1hWPixVOTQnxV4ez6c+QlErgQkaTuNMIfBJ7w
+mS2qo7qzK4ohFamRPn15ne7A15s7hyJPPV10CH3vOq0nezdCgU/D8F6g7ZmMuhYp
+ShOLSK9Vnser8+jE52DmR/+wmiyxWX8pA/qh1yHP4jZFLI3f9/44w0nvFZUxE/Wa
+1xzpoPgb0aMwS2ilXF+/38vXgvMK1+tH1Era5rxi6qllX/G/7s9ycQs=
+                    </ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+        </KeyDescriptor>        
+        <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://auth.nih.gov/affwebservices/public/saml2sso"/>
+		<SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://auth.nih.gov/affwebservices/public/saml2sso"/>
+<!--        <Attribute Name="https://federation.nih.gov/person/UserPrincipalName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:ns2="urn:oasis:names:tc:SAML:2.0:assertion"/>
+        <Attribute Name="https://federation.nih.gov/person/Mail" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:ns3="urn:oasis:names:tc:SAML:2.0:assertion"/>
+        <Attribute Name="https://federation.nih.gov/person/FirstName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:ns4="urn:oasis:names:tc:SAML:2.0:assertion"/>
+        <Attribute Name="https://federation.nih.gov/person/LastName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:ns5="urn:oasis:names:tc:SAML:2.0:assertion"/>
+        <Attribute Name="https://federation.nih.gov/person/NEDID" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:ns6="urn:oasis:names:tc:SAML:2.0:assertion"/> 
+-->
+ </IDPSSODescriptor>
+</EntityDescriptor>
