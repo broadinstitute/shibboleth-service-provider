@@ -71,10 +71,11 @@
             helpLocation="/about.html"
             styleSheet="/shibboleth-sp/main.css"/>
         
-        <MetadataProvider
+       <!-- <MetadataProvider
             type="XML"
             uri="--IDP_METADATA_URL--"
             backingFilePath="saml2-nih-wamprod-idp.xml" reloadInterval="90000" />
+        -->
         <!-- Example of remotely supplied batch of signed metadata. -->
         <!--
         <MetadataProvider type="XML" uri="http://federation.org/federation-metadata.xml"
@@ -85,18 +86,17 @@
         -->
 
         <!-- Example of locally maintained metadata. -->
-        <!--
-        <MetadataProvider type="XML" file="partner-metadata.xml"/>
-        -->
+        <MetadataProvider type="XML" file="saml2-nih-wamprod-idp.xml"/>
+        
 
         <!-- Map to extract attributes from SAML assertions. -->
-        <AttributeExtractor type="XML" validate="false" reloadChanges="false" path="attribute-map.xml"/>
+        <AttributeExtractor type="XML" validate="true" reloadChanges="false" path="attribute-map.xml"/>
         
         <!-- Use a SAML query if no attributes are supplied during SSO. -->
         <AttributeResolver type="Query" subjectMatch="true"/>
 
         <!-- Default filtering policy for recognized attributes, lets other data pass. -->
-        <AttributeFilter type="XML" validate="false" path="attribute-policy.xml"/>
+        <AttributeFilter type="XML" validate="true" path="attribute-policy.xml"/>
 
         <!-- Simple file-based resolver for using a single keypair. -->
         <CredentialResolver type="File" key="sp-key.pem" certificate="sp-cert.pem"/>
@@ -116,9 +116,9 @@
     </ApplicationDefaults>
     
     <!-- Policies that determine how to process and authenticate runtime messages. -->
-    <SecurityPolicyProvider type="XML" validate="false" path="security-policy.xml"/>
+    <SecurityPolicyProvider type="XML" validate="true" path="security-policy.xml"/>
 
     <!-- Low-level configuration about protocols and bindings available for use. -->
-    <ProtocolProvider type="XML" validate="false" reloadChanges="false" path="protocols.xml"/>
+    <ProtocolProvider type="XML" validate="true" reloadChanges="false" path="protocols.xml"/>
 
 </SPConfig>

@@ -2,7 +2,7 @@
 
   <!-- See /var/log/shibboleth/shibd.log for hints on how to decode these attributes. -->
   <!-- id attribute names the environment variable. -->
-  <Attribute name="https://federation.nih.gov/person/NEDID"
+  <Attribute name="https://federation.nih.gov/person/CommonName"
              nameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified"
              id="NIH_USERNAME"></Attribute>
     
