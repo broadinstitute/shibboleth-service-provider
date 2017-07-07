@@ -37,6 +37,7 @@ COPY src/docker/run/apache-run.sh /etc/service/apache/run
 COPY src/docker/run/shibboleth2.xml src/docker/run/attribute-map.xml /etc/shibboleth/
 COPY src/docker/run/shibboleth-run.sh /etc/service/shibboleth/run
 COPY src/docker/run/app-run.sh /etc/service/app/run
+COPY src/docker/run/saml2-nih-wamprod-idp.xml /etc/shibboleth/saml2-nih-wamprod-idp.xml
 COPY target /working/target
 
 # Idp metadata available at https://this-host/Shibboleth.sso/Metadata
