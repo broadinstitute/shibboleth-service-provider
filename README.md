@@ -2,6 +2,34 @@
 
 A generic Shibboleth service provider service for use in Shibboleth authentication schemes (e.g. NIH).
 
+![eRA Commons Account Linking Sequence Diagram](era-commons-flow.png)
+
+<!--
+title eRA Commons Account Linking with Shibboleth Service
+Browser->UI: eRA Commons account linking page
+UI->Browser: <a https://shibboleth.../link-nih-account?redirect-url=...{token}> [1]
+Browser->Shibboleth: link-nih-account?redirect-url=...{token}
+Shibboleth->Browser: Set redirect-url cookie and redirect to /login-and-redirect [2]
+Browser->Shibboleth: login-and-redirect
+Shibboleth->Shibboleth: Not signed in to eRA Commons [3]
+Shibboleth->Browser: Redirect to eRA Commons login at auth.nih.gov/...
+Browser->NIH: Login Page
+NIH->Browser: Login Page
+Browser->NIH: Credentials
+NIH->Browser: Redirect back to login-and-redirect with SAML response
+Browser->Shibboleth: login-and-redirect (with redirect-url cookie)
+Shibboleth->Shibboleth: Create JWT from NIH SAML response [4]
+Shibboleth->Browser: Redirect to redirect-url
+Browser->UI: /[redirect-url]...token=[JWT]
+UI->UI: Handle JWT [5]
+-->
+
+1. The web UI presents a link that contains a `redirect-url` parameter which includes the literal string `{token}`. Once the user has successfully completed the eRA Commons login flow, they will be redirected to this URL with the `{token}` literal replaced by the encoded JWT.
+2. The passed `redirect-url` parameter is stored as a cookie so it can be used later.
+3. The /login-and-redirect path is handled by the libapache2-mod-shib2 Apache module. The user is able to visit that path only if they have an active eRA Commons session. Otherwise, they are automatically redirected to the eRA Commons login page.
+4. The JWT is encoded (`jwt-encode(era-commons-username, secret)`) and signed with the secret at vault path `secret/dsde/prod/shibboleth/signing-secret`. The same secret must be used to verify the token passed to the `redirect-url` parameter.
+5. `era-commons-username = jwt-decode(token, secret)`
+
 ## Configuration
 
 Copy `src/docker/run/config-example.json` `target/config/config.json` and modify for your environment. Run the container to see additional configuration requirements. If you're using Vault, you can generate secrets using this command:
