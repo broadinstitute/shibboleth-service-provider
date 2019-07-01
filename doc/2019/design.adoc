@@ -1,5 +1,9 @@
 = Shibboleth Service Provider Design
 
+ifdef::env-github[]
+:note-caption: :information_source:
+endif::[]
+
 == Purpose
 The purpose of the Shibboleth Service is to provide a mechanism for linking an eRA Commons identity with the identity of another system. A secondary purpose is to ensure this service may be used as widely as possible to prevent others from having to duplicate this work to achieve similar ends.
 
