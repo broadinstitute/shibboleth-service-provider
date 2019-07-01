@@ -14,6 +14,11 @@ The flow begins with a user's browser requesting the `/link-nih-account` endpoin
 
 The SAML protocol defines a protected URL that may be accessed only upon successful authentication to the identity provider. This service will only see the request once that authentication flow has finished. Therefore, the `/link-nih-account` endpoint saves a cookie in the user's browser containing the `redirect-url` parameter before redirecting the user to the protected `/assert` endpoint.
 
+[NOTE]
+====
+While it may be possible to have the eRA Commons identity provider include the redirect URL parameter in the SAML response, obviating the need to save it in a cookie, we prefer to not depend on this functionality in a third-party system.
+====
+
 Upon successful authentication to eRA Commons, the user is once again redirected to the `/assert` endpoint, which now sees the request and can read it, including the SAML response which contains the eRA Commons username. The service encodes the token, signing with its private key, reads the `redirect-url` from the saved cookie, and redirects the user after replacing "{token}" in the URL with the encoded and signed token.
 
 == Security Considerations
