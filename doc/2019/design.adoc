@@ -1,0 +1,44 @@
+= Shibboleth Service Provider Design
+
+ifdef::env-github[]
+:note-caption: :information_source:
+endif::[]
+
+== Purpose
+The purpose of the Shibboleth Service is to provide a mechanism for linking an eRA Commons identity with the identity of another system. A secondary purpose is to ensure this service may be used as widely as possible to prevent others from having to duplicate this work to achieve similar ends.
+
+== Philosophy
+Anyone, without prior arrangement, should be able to integrate with the Shibbleth Service. Minimal friction is key to wide adoption.
+
+== Mechanism
+The mechanism exposed by this service is to provide an authenticated claim to any valid requesting service. The claim contains an eRA Commons username and is signed by the service using a private key. A valid claim (verified against the service's public key) asserts that the holder has successfully authenticated against the eRA Commons identity provider with the contained eRA Commons username.
+
+== Flow
+The flow begins with a user's browser requesting the `/link-nih-account` endpoint. This request must include a `redirect-url` parameter encoded in the URL with the literal string "{token}" embedded somewhere within. This string will be replaced with the authenticated token just before redirecting the user after the user's successful sign-in to eRA Commons.
+
+The SAML protocol defines a protected URL that may be accessed only upon successful authentication to the identity provider. This service will only see the request once that authentication flow has finished. Therefore, the `/link-nih-account` endpoint saves a cookie in the user's browser containing the `redirect-url` parameter before redirecting the user to the protected `/assert` endpoint.
+
+[NOTE]
+====
+While it may be possible to have the eRA Commons identity provider include the redirect URL parameter in the SAML response, obviating the need to save it in a cookie, we prefer to not depend on this functionality in a third-party system.
+====
+
+Upon successful authentication to eRA Commons, the user is once again redirected to the `/assert` endpoint, which now sees the request and can read it, including the SAML response which contains the eRA Commons username. The service encodes the token, signing with its private key, reads the `redirect-url` from the saved cookie, and redirects the user after replacing "{token}" in the URL with the encoded and signed token.
+
+== Security Considerations
+=== Risk
+When a user is redirected after completing an eRA Commons sign-in, it is likely they will trust the next page they see in their browser. Therefore, the value of the `redirect-url` parameter must be trustworthy.
+
+=== Mitigation
+To ensure this, we check any incoming value against a whitelist. Values not on the whitelist are shown a warning page and must manually proceed rather than being automatically redirected. This strikes a balance between security and the goal of minimizing friction, since new clients of this service can test the complete flow before having their service added to the whitelist, thus removing the warning.
+
+=== Risk
+SAML is a non-trivial protocol and must be implemented correctly to avoid security holes.
+
+=== Mitigation
+The service will not implement the protocol but instead use a library for this handoff.
+
+== Scaling Considerations
+The demands on the service are not high. It does not store state and must only field incoming HTTP requests. We expect clients to direct users into this flow only occasionally and cache the result for some limited lifetime. However, we do expect wide usage, since the service is designed to be used by any party that needs the provided functionality.
+
+We have selected NodeJs on Google App Engine Standard (GAES). Node's asynchronous architecture should provide efficient usage of resources and GAES scales the number of servers automatically based on request load. This should be sufficient to ensure the availability of the service even in the event of a denial-of-service attack, but would result in an increased cost of operation. For now, we consider this risk acceptable.
