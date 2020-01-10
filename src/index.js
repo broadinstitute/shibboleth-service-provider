@@ -87,17 +87,17 @@ function authWithKey(key, req, res, next) {
 async function main(opts) {
   const {
     liveReloadEnabled,
-    writeablePath, port, mainPath,
-    url,
+    writeablePath, srcRoot, mainPath,
+    url, port,
     before = (req, res, next) => { next() },
     after = (req, res) => { res.send(`${(new Date()).toISOString()}: Code reloaded.\n`).end() },
     log = console.log
   } = opts
 
-  let app = liveReloadEnabled ? undefined : require(mainPath)
+  let app = liveReloadEnabled ? undefined : (await require(mainPath))
 
-  function resetApp() {
-    app = require(mainPath)
+  async function resetApp() {
+    app = await require(path.join(writeablePath, srcRoot, mainPath))
     app.post(url, before, async (req, res, next) => {
       await spawnp('rm', ['-rf', writeablePath]).promise
       await spawnp('mkdir', ['-p', writeablePath]).promise
@@ -113,7 +113,7 @@ async function main(opts) {
             delete require.cache[key]
           }
         })
-        resetApp()
+        await resetApp()
         log('done.')
         after(req, res)
       })
@@ -121,8 +121,9 @@ async function main(opts) {
   }
 
   if (liveReloadEnabled) {
-    copyFiles(writeablePath)
-    resetApp()
+    await spawnp('rm', ['-rf', writeablePath]).promise
+    await copyFiles(writeablePath)
+    await resetApp()
     log('Live code reloading enabled.')
   }
   const server = http.createServer((req, res) => {
@@ -134,9 +135,10 @@ async function main(opts) {
 main({
   liveReloadEnabled: process.env.LIVE_CODE_RELOAD === 'true',
   writeablePath: '/tmp/aelivedev',
-  port: process.env.PORT || 8080,
+  srcRoot: 'src',
   mainPath: './main.js',
   url: '/.src',
+  port: process.env.PORT || 8080,
   before: async (req, res, next) => {
     const key = (await fs.readFile('.authkey', {encoding: 'utf8'})).trim()
     authWithKey(key, req, res, next)
