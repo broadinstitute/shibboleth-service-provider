@@ -1,0 +1,21 @@
+[req]
+RANDFILE=/dev/urandom
+default_bits=3072
+default_md=sha256
+encrypt_key=no
+distinguished_name=dn
+# PrintableStrings only
+string_mask=MASK:0002
+prompt=no
+x509_extensions=ext
+
+# customize the "default_keyfile,", "CN" and "subjectAltName" lines below
+default_keyfile=sp-key.pem
+
+[dn]
+CN=broad-shibboleth-dev.appspot.com
+
+[ext]
+subjectAltName = DNS:broad-shibboleth-dev.appspot.com, \
+                 URI:https://broad-shibboleth-dev.appspot.com
+subjectKeyIdentifier=hash

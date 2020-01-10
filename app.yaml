@@ -1,0 +1,11 @@
+runtime: nodejs10
+
+env_variables:
+  CONFIG_PATH: "gs://broad-shibboleth-prod.appspot.com/configs/config.20200103a.json"
+  LIVE_CODE_RELOAD: "false"
+
+handlers:
+- url: /.*
+  secure: always
+  redirect_http_response_code: 301
+  script: auto
