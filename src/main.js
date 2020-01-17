@@ -209,7 +209,6 @@ async function createApp() {
   const idp = new saml2.IdentityProvider(idpOptions)
 
   app.get("/metadata.xml", function(req, res) {
-    console.log(spOptions)
     res.type('application/xml').send(sp.create_metadata()).end()
   })
 
@@ -221,6 +220,25 @@ async function createApp() {
       res.redirect(loginUrl)
     })
   })
+
+  function isWhiteListed(url) {
+    return false
+  }
+
+  function redirectOrPause(res, returnUrl) {
+    if (isWhiteListed(returnUrl)) {
+      return res.redirect(returnUrl)
+    } else {
+      res.send([
+        '<h2>Un-Truested Return URL</h2>',
+        `<p>The provided return url:</p>`,
+        `<p><b>${escapeHtml(returnUrl)}</b></p>`,
+        `<p>is not trusted. Contact `,
+        `<a href="https://support.terra.bio/hc/en-us">Terra Support</a>`,
+        ` to request a new trusted URL.</p>`,
+      ].join('')).end()
+    }
+  }
 
   app.post("/assert", bodyParser.urlencoded({extended: true}), function(req, res) {
     const options = {request_body: req.body}
@@ -234,8 +252,7 @@ async function createApp() {
       const payload = {eraCommonsUsername: samlResponse.user.name_id}
       const token = jwt.sign(payload, privateKey, {algorithm: 'RS256'})
       const returnUrl = cookies['return-url'].replace('<token>', token)
-      console.log(JSON.stringify({redirectUrl: cookies['return-url'], samlResponse: samlResponse}, null, 2))
-      res.redirect(returnUrl)
+      return redirectOrPause(res, returnUrl)
     })
   })
 
