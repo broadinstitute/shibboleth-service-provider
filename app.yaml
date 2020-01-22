@@ -2,7 +2,7 @@ runtime: nodejs10
 
 env_variables:
   CONFIG_PATH: "gs://broad-shibboleth-prod.appspot.com/configs/config.20200103a.json"
-  LIVE_CODE_RELOAD: "false"
+  LIVE_CODE_RELOAD: "true"
 
 handlers:
 - url: /.*
