@@ -140,7 +140,7 @@ async function createApp() {
 
   app.get('/dev/login', (req, res, next) => {
     const returnUrl = req.query['return-url']
-    res.cookie('return-url', returnUrl, {httpOnly: true})
+    res.cookie('return-url', returnUrl, {httpOnly: true, secure: true})
     res.send([
       '<h2>Fake eRA Commons Login Page</h2>',
       `<p>return URL: <b>${escapeHtml(returnUrl)}</b></p>`,
@@ -156,7 +156,6 @@ async function createApp() {
     const body = await u.consumeStreamp(req)
     const cleaned = decodeUriEncoded(body.toString(), true)
     const cookies = decodeUriEncoded(req.get('cookie'))
-    console.log('cookies:', cookies)
     const fakeUsername = cleaned.fakeUsername.length === 0 ? undefined : cleaned.fakeUsername
     const payload = {'fake-era-commons-username': fakeUsername}
     const privateKey = configData.devKeyPrivate
