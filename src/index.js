@@ -3,6 +3,8 @@ const fs = require('fs').promises
 const http = require('http')
 const path = require('path')
 
+const nodeModulesPath = path.resolve('node_modules')
+
 function ucFirst(s) { return s[0].toUpperCase() + s.slice(1) }
 
 function bufferListToLines(buffers) {
@@ -84,48 +86,93 @@ function authWithKey(key, req, res, next) {
   }
 }
 
+async function overwriteFiles(log, writeablePath, req) {
+  await spawnp('rm', ['-rf', writeablePath]).promise
+  await spawnp('mkdir', ['-p', writeablePath]).promise
+  const untar = spawnp('tar', ['-x'], {cwd: writeablePath})
+  const pipe = req.pipe(untar.p.stdin)
+  return new Promise((resolve) => {
+    pipe.on('finish', resolve)
+  })
+}
+
+function getFilteredRequireCache() {
+  return Object.keys(require.cache).filter(x => !x.startsWith(nodeModulesPath))
+}
+
+function purgeCache(log, writeablePath) {
+  log('purging require cache...')
+  getFilteredRequireCache().forEach((key) => {
+    log(key)
+    delete require.cache[key]
+  })
+  log('done.')
+}
+
+function logRequireCache(log) {
+  log('*** require.cache ***')
+  getFilteredRequireCache().forEach((key) => {
+    log(key)
+  })
+  log('*** end ***')
+}
+
 async function main(opts) {
   const {
     liveReloadEnabled,
-    writeablePath, srcRoot, mainPath,
+    writeablePath, mainPath,
     url, port,
     before = (req, res, next) => { next() },
     after = (req, res) => { res.send(`${(new Date()).toISOString()}: Code reloaded.\n`).end() },
     log = console.log
   } = opts
 
-  let app = liveReloadEnabled ? undefined : (await require(mainPath))
+  let app = undefined
 
   async function resetApp() {
-    app = await require(path.join(writeablePath, srcRoot, mainPath))
+    app = await require(mainPath)
+
+    logRequireCache(log)
+
     app.post(url, before, async (req, res, next) => {
+      if (!(req.locals && req.locals.isReloadOkay)) {
+        return res.status(401)
+          .send(JSON.stringify(
+            {error: {message: 'req.locals.isReloadOkay is not defined or is false'}}, null, 2)+'\n')
+          .end()
+      }
+      await overwriteFiles(log, writeablePath, req)
+      purgeCache(log, writeablePath)
+      await resetApp()
+      log('reloaded.')
+      next()
+    })
+    app.post(url, after)
+    app.delete(url, async (req, res, next) => {
       await spawnp('rm', ['-rf', writeablePath]).promise
-      await spawnp('mkdir', ['-p', writeablePath]).promise
-      const untar = spawnp('tar', ['-x'], {cwd: writeablePath})
-      const pipe = req.pipe(untar.p.stdin)
-      pipe.on('finish', async () => {
-        log('reloading...')
-        const resolvedWriteablePath = path.dirname(
-          require.resolve(path.join(writeablePath, 'package.json')))
-        Object.keys(require.cache).forEach((key) => {
-          if (key.startsWith(resolvedWriteablePath)) {
-            log(key)
-            delete require.cache[key]
-          }
-        })
-        await resetApp()
-        log('done.')
-        after(req, res)
-      })
+      log(`cleared ${writeablePath}.`)
+      await copyFiles(writeablePath)
+      purgeCache(log, writeablePath)
+      await resetApp()
+      res.send(`${(new Date()).toISOString()}: Code reset.\n`).end()
     })
   }
 
+  // Start with a clean slate.
+  await spawnp('rm', ['-rf', writeablePath]).promise
+
   if (liveReloadEnabled) {
-    await spawnp('rm', ['-rf', writeablePath]).promise
+    // There appears to be some internal state in Node's require that prefers to load files from
+    // where they were found last time, so if we want to be able to load them from a writeable
+    // directory, we need to place them there before the first call to `require`.
     await copyFiles(writeablePath)
     await resetApp()
     log('Live code reloading enabled.')
+  } else {
+    app = await require(mainPath)
+    logRequireCache(log)
   }
+
   const server = http.createServer((req, res) => {
     app(req, res)
   })
@@ -133,14 +180,9 @@ async function main(opts) {
 }
 
 main({
-  liveReloadEnabled: process.env.LIVE_CODE_RELOAD === 'true',
+  liveReloadEnabled: false,
   writeablePath: '/tmp/aelivedev',
-  srcRoot: 'src',
-  mainPath: './main.js',
+  mainPath: 'main',
   url: '/.src',
   port: process.env.PORT || 8080,
-  before: async (req, res, next) => {
-    const key = (await fs.readFile('.authkey', {encoding: 'utf8'})).trim()
-    authWithKey(key, req, res, next)
-  }
 }).catch((e) => { throw e })
