@@ -126,7 +126,8 @@ app.get('/', (req, res, next) => {
 
 app.get('/dev/login', (req, res, next) => {
   const returnUrl = req.query['return-url']
-  res.cookie('return-url', returnUrl, {httpOnly: true, secure: true})
+  const isDev = process.env.NODE_ENV !== 'production' // set by App Engine
+  res.cookie('return-url', returnUrl, {httpOnly: true, secure: isDev ? false : true})
   res.send([
     '<h2>Fake eRA Commons Login Page</h2>',
     `<p>return URL: <b>${escapeHtml(returnUrl)}</b></p>`,
@@ -149,11 +150,11 @@ app.post('/dev/login', withConfig, async (req, res, next) => {
   const returnUrl = cookies['return-url'].replace('<token>', token)
   res.send([
     '<h2>"Sign-In" Successful!</h2>',
-    `<p>fake username: <b>${fakeUsername}</b></p>`,
+    `<p>fake username: <b>${escapeHtml(fakeUsername)}</b></p>`,
     '<h3>JWT</h3>',
     '<p>signing key: <b>(dev private key)</b></p>',
     '<p>verification key: <b><a href="/dev/public-key.pem">/dev/public-key.pem</a></b></p>',
-    `<p>token payload: <b>${JSON.stringify(payload)}</b></p>`,
+    `<p>token payload: <b>${escapeHtml(JSON.stringify(payload))}</b></p>`,
     `<p>token:<br><b>${token.match(/.{1,40}/g).join('<br>')}</b></p>`,
     '<h3>Return URL</h3>',
     `<a href="${returnUrl}">${returnUrl.match(/.{1,40}/g).join('<br>')}</a>`,
