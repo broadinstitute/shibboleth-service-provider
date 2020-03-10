@@ -127,7 +127,11 @@ app.get('/', (req, res, next) => {
 app.get('/dev/login', (req, res, next) => {
   const returnUrl = req.query['return-url']
   const isDev = process.env.NODE_ENV !== 'production' // set by App Engine
-  res.cookie('return-url', returnUrl, {httpOnly: true, secure: isDev ? false : true})
+  res.set(
+    'Set-Cookie',
+    `return-url=${encodeURIComponent(returnUrl)}; Path=/; HttpOnly; SameSite=None` +
+    (isDev ? '' : '; Secure')
+  )
   res.send([
     '<h2>Fake eRA Commons Login Page</h2>',
     `<p>return URL: <b>${escapeHtml(returnUrl)}</b></p>`,
@@ -217,7 +221,10 @@ app.get("/metadata.xml", withSp, function(req, res) {
 
 app.get("/login", [withSp, withIdp], function(req, res) {
   const returnUrl = req.query['return-url']
-  res.cookie('return-url', returnUrl, {httpOnly: true, secure: true})
+  res.set(
+    'Set-Cookie',
+    `return-url=${encodeURIComponent(returnUrl)}; Path=/; HttpOnly; Secure; SameSite=None`
+  )
   req.sp.create_login_request_url(req.idp, {}, (err, loginUrl, requestId) => {
     if (err) return console.error(err)
     res.redirect(loginUrl)
@@ -268,12 +275,17 @@ app.post("/assert", [withSp, withIdp], bodyParser.urlencoded({extended: true}), 
       console.error(err)
       return res.status(500)
     }
-    const cookies = decodeUriEncoded(req.get('cookie'))
-    const privateKey = req.config.data.prodKeyPrivate
-    const payload = {eraCommonsUsername: samlResponse.user.name_id}
-    const token = jwt.sign(payload, privateKey, {algorithm: 'RS256'})
-    const returnUrl = cookies['return-url'].replace('<token>', token)
-    return redirectOrPause(res, returnUrl, token)
+    try {
+      const cookies = decodeUriEncoded(req.get('cookie'))
+      const privateKey = req.config.data.prodKeyPrivate
+      const payload = {eraCommonsUsername: samlResponse.user.name_id}
+      const token = jwt.sign(payload, privateKey, {algorithm: 'RS256'})
+      const returnUrl = cookies['return-url'].replace('<token>', token)
+      return redirectOrPause(res, returnUrl, token)
+    } catch (e) {
+      console.error(e)
+      return res.status(500)
+    }
   })
 })
 
