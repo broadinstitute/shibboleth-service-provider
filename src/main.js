@@ -67,7 +67,7 @@ app.post('/.src', async (req, res, next) => {
     next()
     return
   }
-  const requiredPerm = 'appengine.applications.create'
+  const requiredPerm = 'appengine.applications.update'
   const permsCheck = u.httpreq({
     hostname: 'cloudresourcemanager.googleapis.com',
     path: `/v1/projects/${process.env.GOOGLE_CLOUD_PROJECT}:testIamPermissions`,
