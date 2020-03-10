@@ -65,27 +65,6 @@ async function copyFiles(writeablePath) {
   await Promise.all([tar.promise, untar.promise])
 }
 
-function authWithKey(key, req, res, next) {
-  const sendAuthError = (obj) => {
-    res.type('application/json').status(401).send(JSON.stringify(obj, null, 2)+'\n').end()
-  }
-  const authHeader = (req.headers['authorization'] || '').trim()
-  if (authHeader.length === 0) {
-    return sendAuthError({error: {message: 'missing Authorization header'}})
-  }
-  const [type, value] = authHeader.split(/\s+/)
-  if (type.toLowerCase() === 'key') {
-    if (value !== key) {
-      return sendAuthError({error: {message: 'invalid auth key', type, value, header: authHeader}})
-    } else {
-      req.auth = {key: value}
-      return next()
-    }
-  } else {
-    return sendAuthError({error: {message: 'invalid auth type', type, value, header: authHeader}})
-  }
-}
-
 async function overwriteFiles(log, writeablePath, req) {
   await spawnp('rm', ['-rf', writeablePath]).promise
   await spawnp('mkdir', ['-p', writeablePath]).promise
