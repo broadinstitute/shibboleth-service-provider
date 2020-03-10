@@ -159,7 +159,7 @@ async function main(opts) {
 }
 
 main({
-  liveReloadEnabled: false,
+  liveReloadEnabled: true,
   writeablePath: '/tmp/aelivedev',
   mainPath: 'main',
   url: '/.src',
