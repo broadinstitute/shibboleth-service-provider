@@ -44,6 +44,17 @@ function verifyJwt(token, publicKey) {
 
 const app = express()
 
+app.use((req, res, next) => {
+  if (req.headers['host'] !== 'shibboleth.dsde-prod.broadinstitute.org') {
+    return next()
+  }
+  res.status(400)
+  res.write('This version of the Shibboleth service has been permanently shut down.')
+  res.write(' The current version is\navailable at broad-shibboleth-prod.appspot.com.')
+  res.write(' Contact support@terra.bio for migration assistance.\n')
+  res.end()
+})
+
 app.get('/hello', (req, res) => {
   res.send(`The time is: ${(new Date()).toISOString()}\n`)
 })
