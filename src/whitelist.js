@@ -5,5 +5,6 @@ module.exports = [
   'https://all-of-us-rw-stable.appspot.com',
   'https://all-of-us-rw-perf.appspot.com',
   'https://all-of-us-rw-preprod.appspot.com',
-  'https://workbench.researchallofus.org'
+  'https://workbench.researchallofus.org',
+  'https://app.terra.bio'
 ]
