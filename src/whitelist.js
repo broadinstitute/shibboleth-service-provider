@@ -7,6 +7,12 @@ module.exports = [
   'https://all-of-us-rw-preprod.appspot.com',
   'https://workbench.researchallofus.org',
   'https://app.terra.bio',
+  'https://firecloud.terra.bio',
+  'https://datastage.terra.bio',
+  'https://anvil.terra.bio',
+  'https://ukbiobank.terra.bio',
+  'https://baseline.terra.bio',
+  'https://terra.biodatacatalyst.nhlbi.nih.gov',
   'https://duos.broadinstitute.org',
   'https://duos.dsp-duos-staging.broadinstitute.org',
   'https://duos.dsp-duos-dev.broadinstitute.org'
