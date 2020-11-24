@@ -1,3 +1,4 @@
+const assert = require('assert').strict
 const auth = require('auth')
 const bodyParser = require('body-parser')
 const config = require('config')
@@ -10,6 +11,8 @@ const url = require('url')
 const u = require('utils')
 const whitelist = require('whitelist')
 
+// TODO(dmohs): This doesn't make sense. Since I have to change code to update the config, there is
+// little value in this separation. Just inline the values here instead.
 const configPath = 'gs://broad-shibboleth-prod.appspot.com/configs/config.20200103a.json'
 
 function escapeHtml(html) {
@@ -79,6 +82,10 @@ app.post('/.src', async (req, res, next) => {
     return
   }
   const requiredPerm = 'appengine.applications.update'
+  assert.ok(
+    process.env.GOOGLE_CLOUD_PROJECT,
+    'GOOGLE_CLOUD_PROJECT environment variable not defined'
+  )
   const permsCheck = u.httpreq({
     hostname: 'cloudresourcemanager.googleapis.com',
     path: `/v1/projects/${process.env.GOOGLE_CLOUD_PROJECT}:testIamPermissions`,
