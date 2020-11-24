@@ -2,85 +2,64 @@
 
 A generic Shibboleth service provider service for use in Shibboleth authentication schemes (e.g. NIH).
 
+https://broad-shibboleth-prod.appspot.com/
+
 ![eRA Commons Account Linking Sequence Diagram](era-commons-flow.png)
 
 <!--
 title eRA Commons Account Linking with Shibboleth Service
 Browser->UI: eRA Commons account linking page
-UI->Browser: <a https://shibboleth.../link-nih-account?redirect-url=...{token}> [1]
-Browser->Shibboleth: link-nih-account?redirect-url=...{token}
-Shibboleth->Browser: Set redirect-url cookie and redirect to /login-and-redirect [2]
-Browser->Shibboleth: login-and-redirect
-Shibboleth->Shibboleth: Not signed in to eRA Commons [3]
-Shibboleth->Browser: Redirect to eRA Commons login at auth.nih.gov/...
+UI->Browser: <a https://shibboleth.../login?return-url=...{token}> [1]
+Browser->Shibboleth: login?return-url=...{token}
+Shibboleth->Browser: Set return-url cookie and redirect to eRA Commons Login page
 Browser->NIH: Login Page
 NIH->Browser: Login Page
 Browser->NIH: Credentials
-NIH->Browser: Redirect back to login-and-redirect with SAML response
-Browser->Shibboleth: login-and-redirect (with redirect-url cookie)
-Shibboleth->Shibboleth: Create JWT from NIH SAML response [4]
-Shibboleth->Browser: Redirect to redirect-url
-Browser->UI: /[redirect-url]...token=[JWT]
-UI->UI: Handle JWT [5]
+NIH->Browser: Ask broswer to POST to /assert with SAML payload
+Browser->Shibboleth: POST SAML payload to /assert (with return-url cookie)
+Shibboleth->Shibboleth: Create JWT from NIH SAML response [2]
+Shibboleth->Browser: Redirect to return-url
+Browser->UI: /[return-url]...token=[JWT]
+UI->UI: Handle JWT
 -->
 
-1. The web UI presents a link that contains a `redirect-url` parameter which includes the literal string `{token}`. Once the user has successfully completed the eRA Commons login flow, they will be redirected to this URL with the `{token}` literal replaced by the encoded JWT.
-2. The passed `redirect-url` parameter is stored as a cookie so it can be used later.
-3. The /login-and-redirect path is handled by the libapache2-mod-shib2 Apache module. The user is able to visit that path only if they have an active eRA Commons session. Otherwise, they are automatically redirected to the eRA Commons login page.
-4. The JWT is encoded (`jwt-encode(era-commons-username, secret)`) and signed with the secret at vault path `secret/dsde/prod/shibboleth/signing-secret`. The same secret must be used to verify the token passed to the `redirect-url` parameter.
-5. `era-commons-username = jwt-decode(token, secret)`
+1. The web UI presents a link with a `return-url` parameter which includes the literal string `{token}`. Once the user has successfully completed the eRA Commons login flow, they will be redirected to this URL with the `{token}` literal replaced by the encoded JWT.
+2. The JWT is encoded and signed with this system's private key. It must be verified using this system's public key, available at the URL `/public-key.pem`.
 
-## Configuration
+## Development
 
-Copy `src/docker/run/config-example.json` `target/config/config.json` and modify for your environment. Run the container to see additional configuration requirements. If you're using Vault, you can generate secrets using this command:
-```bash
-docker run --rm -v "$PWD":/working broadinstitute/shibboleth-service-provider \
-  fetch-vault-configs <vault-token> <environment-name>
-```
-* `vault-token`: usually "$(<~/.vault-token)"
-* `environment-name`: `dev` or `prod`
+### Philosophy
 
-## Running for Development
+Fast cycles enable learning through experimentation. This provides the foundation for deep system interrogation and innovation as well as safety because of the ability to recover quickly. Fast cycles have been prioritized in this implementation, both for local changes as well as changes to the system as it exists in a production environment.
 
-`DEV=true` exposes the `/restart` endpoint for server restarting.
+Approachability is achieved through supporting development and testing as first-class features. Fake, development-appropriate flows with examples are implemented and supported as production features.
+
+Loose coupling is achieved through parameterization, specifically the `return-url`. This has security implications, so these URLs must be on a whitelist. The flow is carefully constructed so developers can complete and test a production implementation before requesting addition to the whitelist, which is not necessary to enable the flow, only to make it smoother.
+
+### Getting Started
 
 ```bash
-docker run -it --rm --name shib -p 80:80 -p 443:443 \
-  -e DEV='true' -v "$PWD":/working \
-  broadinstitute/shibboleth-service-provider
+npm start
 ```
 
-## Building
-
-`lein cljsbuild auto` will rebuild whenever files are changed and restart the server by calling `https://$APP_HOST/restart`.
+Minimal server up test:
 
 ```bash
-docker run --rm -it -v "$PWD":/working -e APP_HOST=shib \
-  broadinstitute/shibboleth-service-provider-build \
-  lein cljsbuild auto
+curl localhost:8080/hello
 ```
 
-## Deploying
+Beyond this, it should be possible to interrogate the system by using any HTTP client. The error messages should help guide toward correct usage. This ideal is not always achieved, but it is the goal.
 
-Steps to build a deployment image:
-```bash
-docker build -t broadinstitute/shibboleth-service-provider-build -f src/docker/build/Dockerfile .
-docker run --rm -it -v "$PWD":/working broadinstitute/shibboleth-service-provider-build \
-  lein cljsbuild once
-docker build -t broadinstitute/shibboleth-service-provider -f src/docker/run/Dockerfile .
-# Push docker images.
-# On deployment server, follow the "Configuration" instructions, then:
-docker run -it --rm -p 80:80 -p 443:443 \
-  -v "$PWD"/target:/working/target
-  broadinstitute/shibboleth-service-provider
-```
+### Hot Reloading
 
-## Generating Certificates for Shibboleth
-
-**Warning: This will require coordination with NIH's Identity Provider System.**
+If running locally, the server must be started with the environment variable `GOOGLE_CLOUD_PROJECT` defined, which provides the source for permissions checking.
 
 ```bash
-docker run --rm -it -v "$PWD":/working broadinstitute/shibboleth-service-provider shib-keygen -o .
+GOOGLE_CLOUD_PROJECT=broad-shibboleth-prod npm start
 ```
 
-This will generate `sp-cert.pem` and `sp-key.pem` in $PWD.
+```bash
+tar -c --exclude='./node_modules/*' . \
+  | curl localhost:8080/.src --data-binary @- \
+  -H "Authorization: Bearer $(gcloud auth print-access-token)"
+```
