@@ -63,11 +63,3 @@ tar -c --exclude='./node_modules/*' . \
   | curl localhost:8080/.src --data-binary @- \
   -H "Authorization: Bearer $(gcloud auth print-access-token)"
 ```
-
-## Notes
-
-- premature generalization, implementation vs. requirements
-- decoupling with `return-url` parameter
-- documentation via live examples
-- walk through README
-- walk through scripts
