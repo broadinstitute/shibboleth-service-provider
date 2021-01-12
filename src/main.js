@@ -147,8 +147,8 @@ app.get('/dev/login', (req, res, next) => {
   const isDev = process.env.NODE_ENV !== 'production' // set by App Engine
   res.set(
     'Set-Cookie',
-    `return-url=${encodeURIComponent(returnUrl)}; Path=/; HttpOnly; SameSite=None` +
-    (isDev ? '' : '; Secure')
+    `return-url=${encodeURIComponent(returnUrl)}; Path=/; HttpOnly` +
+    (isDev ? '' : '; SameSite=None; Secure')
   )
   res.send([
     '<h2>Fake eRA Commons Login Page</h2>',
