@@ -147,7 +147,7 @@ app.get('/dev/login', (req, res, next) => {
   const isDev = process.env.NODE_ENV !== 'production' // set by App Engine
   res.set(
     'Set-Cookie',
-    `return-url=${encodeURIComponent(returnUrl)}; Path=/; HttpOnly; SameSite=Strict` +
+    `return-url=${encodeURIComponent(returnUrl)}; Path=/; HttpOnly; SameSite=None` +
     (isDev ? '' : '; Secure')
   )
   res.send([
@@ -241,7 +241,7 @@ app.get("/login", [withSp, withIdp], function(req, res) {
   const returnUrl = req.query['return-url']
   res.set(
     'Set-Cookie',
-    `return-url=${encodeURIComponent(returnUrl)}; Path=/; HttpOnly; Secure; SameSite=Strict`
+    `return-url=${encodeURIComponent(returnUrl)}; Path=/; HttpOnly; Secure; SameSite=None`
   )
   req.sp.create_login_request_url(req.idp, {}, (err, loginUrl, requestId) => {
     if (err) return console.error(err)
