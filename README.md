@@ -63,3 +63,8 @@ tar -c --exclude='./node_modules/*' . \
   | curl localhost:8080/.src --data-binary @- \
   -H "Authorization: Bearer $(gcloud auth print-access-token)"
 ```
+
+### Deployment
+
+The Shibboleth Service Provider is hosted on Google App Engine as a single application which supports both the development and production workflows.
+Google Cloud Build deploys a new version of the application automatically when commits are merged to the `master` branch. 
