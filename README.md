@@ -68,3 +68,10 @@ tar -c --exclude='./node_modules/*' . \
 
 The Shibboleth Service Provider is hosted on Google App Engine as a single application which supports both the development and production workflows.
 Google Cloud Build deploys a new version of the application automatically when commits are merged to the `master` branch. 
+
+## Key Rotation
+The dev flow is used by various unit and integration tests in firecloud-orchestration. Firecloud Orchestration pulls Shibboleth's current dev public key in order
+to decrypt and verify the JWT it receives. The tests store tokens that have been encoded using Shibboleth's dev private key. If we ever need to rotate
+Shibboleth's dev keys, we will need to update those stored tokens to ensure unit and integration tests continue to function.
+
+Integration test tokens are stored in [each service's application.conf template in the firecloud-automated-testing repo](https://github.com/broadinstitute/firecloud-automated-testing/tree/master/configs). Unit test tokens are stored in the [firecloud-orchestration repo](https://github.com/broadinstitute/firecloud-orchestration/blob/develop/src/test/scala/org/broadinstitute/dsde/firecloud/webservice/NihApiServiceSpec.scala).

@@ -166,7 +166,7 @@ app.post('/dev/login', withConfig, async (req, res, next) => {
   const cleaned = decodeUriEncoded(body.toString(), true)
   const cookies = decodeUriEncoded(req.get('cookie'))
   const fakeUsername = cleaned.fakeUsername.length === 0 ? undefined : cleaned.fakeUsername
-  const payload = {'fake-era-commons-username': fakeUsername}
+  const payload = {'eraCommonsUsername': fakeUsername}
   const privateKey = req.config.data.devKeyPrivate
   const token = jwt.sign(payload, privateKey, {algorithm: 'RS256'})
   const returnUrl = cookies['return-url'].replace('<token>', token)
