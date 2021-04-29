@@ -4,7 +4,7 @@ module.exports = [
   'https://all-of-us-rw-staging.appspot.com',
   'https://all-of-us-rw-stable.appspot.com',
   'https://all-of-us-rw-perf.appspot.com',
-  'https://preprod-workbench.researchallofus.org',
+  'https://all-of-us-rw-preprod.appspot.com',
   'https://workbench.researchallofus.org',
   'https://app.terra.bio',
   'https://firecloud.terra.bio',
