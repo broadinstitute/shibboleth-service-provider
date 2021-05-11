@@ -13,7 +13,7 @@ const whitelist = require('whitelist')
 
 // TODO(dmohs): This doesn't make sense. Since I have to change code to update the config, there is
 // little value in this separation. Just inline the values here instead.
-const configPath = 'gs://broad-shibboleth-prod.appspot.com/configs/config.20200103a.json'
+const configPath = 'gs://broad-shibboleth-prod.appspot.com/configs/config.20210510a.json'
 
 function escapeHtml(html) {
   return html
