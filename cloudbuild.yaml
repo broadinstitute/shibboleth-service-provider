@@ -7,13 +7,14 @@ steps:
   entrypoint: bash
   args:
   - -c
-  - curl -H 'Accept: application/vnd.github.v3+json' >
-    -u "dmohs:$$GHTOKEN" >
-    "https://api.github.com/repos/all-of-us/workbench/pulls/$_PR_NUMBER/reviews" >
+  - >
+    curl -H 'Accept: application/vnd.github.v3+json'
+    -u "dmohs:$$GHTOKEN"
+    "https://api.github.com/repos/all-of-us/workbench/pulls/$_PR_NUMBER/reviews"
     -d '{"body": "$SHORT_SHA deployed.", "event": "COMMENT"}'
   secretEnv: ['GHTOKEN']
 availableSecrets:
   secretManager:
-    - versionName: projects/336679256648/secrets/github-token/versions/1
-    - env: GHTOKEN
+  - versionName: projects/336679256648/secrets/github-token/versions/1
+  - env: GHTOKEN
 timeout: "1600s"
