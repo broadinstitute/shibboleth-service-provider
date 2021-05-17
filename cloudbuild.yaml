@@ -8,6 +8,7 @@ steps:
   args:
   - -c
   - >
+    set -x;
     curl -H 'Accept: application/vnd.github.v3+json'
     -u "dmohs:$$GHTOKEN"
     "https://api.github.com/repos/all-of-us/workbench/pulls/$_PR_NUMBER/reviews"
