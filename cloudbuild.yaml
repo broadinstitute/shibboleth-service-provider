@@ -8,10 +8,14 @@ steps:
   args:
   - -c
   - >
+    AH='Accept: application/vnd.github.v3+json';
     set -x;
-    curl -H 'Accept: application/vnd.github.v3+json'
+    curl -LO 'https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64';
+    chmod +x jq-linux64;
+    PRN="$(curl -H "$AH" -u "dmohs:$$GHTOKEN" https://api.github.com/search/issues?q=sha:$COMMIT_SHA+repo:broadinstitute/shibboleth-service-provider | ./jq-linux64 .items[0].number)";
+    curl -H "$AH"
     -u "dmohs:$$GHTOKEN"
-    "https://api.github.com/repos/all-of-us/workbench/pulls/$_PR_NUMBER/reviews"
+    "https://api.github.com/repos/all-of-us/workbench/pulls/$PRN/reviews"
     -d '{"body": "$SHORT_SHA deployed.", "event": "COMMENT"}'
   secretEnv: ['GHTOKEN']
 availableSecrets:
