@@ -16,5 +16,5 @@ steps:
 availableSecrets:
   secretManager:
   - versionName: projects/336679256648/secrets/github-token/versions/1
-  - env: GHTOKEN
+    env: GHTOKEN
 timeout: "1600s"
