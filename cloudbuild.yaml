@@ -1,4 +1,19 @@
 steps:
-- name: "gcr.io/cloud-builders/gcloud"
+- id: gcloud app deploy
+  name: "gcr.io/cloud-builders/gcloud"
   args: ["app", "deploy"]
+- id: Report deployment
+  name: 'launcher.gcr.io/google/ubuntu1604'
+  entrypoint: bash
+  args:
+  - -c
+  - curl -H 'Accept: application/vnd.github.v3+json' >
+    -u "dmohs:$$GHTOKEN" >
+    "https://api.github.com/repos/all-of-us/workbench/pulls/$_PR_NUMBER/reviews" >
+    -d '{"body": "$SHORT_SHA deployed.", "event": "COMMENT"}'
+  secretEnv: ['GHTOKEN']
+availableSecrets:
+  secretManager:
+    - versionName: projects/336679256648/secrets/github-token/versions/1
+    - env: GHTOKEN
 timeout: "1600s"
