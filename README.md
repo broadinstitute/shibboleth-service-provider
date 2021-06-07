@@ -50,6 +50,28 @@ curl localhost:8080/hello
 
 Beyond this, it should be possible to interrogate the system by using any HTTP client. The error messages should help guide toward correct usage. This ideal is not always achieved, but it is the goal.
 
+### Running Dev Flow locally
+
+Before committing/pushing your changes, you should test the dev flow locally.
+
+#### Pre-requisite
+The application gets configuration information from a Google Bucket.  In order for you to run the 
+Shibboleth service locally, you must `gcloud auth login` as your `firecloud.org` user because this is the account that 
+developers own that have access to the configuration bucket.  If you are already logged in as your `firecloud.org` user, 
+try logging in again.  
+
+#### How to execute the dev flow
+1. Open your browser to: http://localhost:8080
+1. Under the "Development Flow" section, click on the link underneath `start:`
+1. Enter any string you want as a "username"
+1. Click "Sign-In"
+1. You should quickly get a response that says ""Sign-In" Successful!" at the top of the page.  If the page hangs, or 
+you get an error at this point, check that you have satisfied the [pre-requisite](#pre-requisite).
+1. At the bottom of the resulting page, there should be a large link titled, "Return URL".  Click on that link.
+1. This should take you to a page title "Example Return Page" and it should have a section title "Verification"
+containing `dev: passed`.  At this point it is normal and expected to say `prod: failed` since we did not test the Prod
+flow.  
+
 ### Hot Reloading
 
 If running locally, the server must be started with the environment variable `GOOGLE_CLOUD_PROJECT` defined, which provides the source for permissions checking.
