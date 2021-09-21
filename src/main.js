@@ -11,6 +11,12 @@ const url = require('url')
 const u = require('utils')
 const whitelist = require('whitelist')
 
+function logoutBeforeLogin(loginUrl) {
+  // Force user to logout before logging into NIH site. This is to avoid the existing NIH session blocks the following Shibboleth.
+  // See https://docs.google.com/document/d/1By4h8fa4KKYJAkIe7hYRoF3vgw6gmsFjmINU2kg43Ig/edit# for more details
+  const logoutUrl = "https://authtest.nih.gov/siteminderagent/smlogoutredirector.asp?TARGET="
+  return logoutUrl + loginUrl
+}
 
 function escapeHtml(html) {
   return html
@@ -242,7 +248,7 @@ app.get("/login", [withSp, withIdp], function(req, res) {
   )
   req.sp.create_login_request_url(req.idp, {}, (err, loginUrl, requestId) => {
     if (err) return console.error(err)
-    res.redirect(loginUrl)
+    res.redirect(logoutBeforeLogin(loginUrl))
   })
 })
 
