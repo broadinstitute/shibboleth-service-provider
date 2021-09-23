@@ -15,7 +15,7 @@ function logoutBeforeLogin(loginUrl) {
   // Force user to logout before logging into NIH site. This is to avoid the existing NIH session blocks the following Shibboleth.
   // See https://docs.google.com/document/d/1By4h8fa4KKYJAkIe7hYRoF3vgw6gmsFjmINU2kg43Ig/edit# for more details
   const logoutUrl = "https://authtest.nih.gov/siteminderagent/smlogoutredirector.asp?TARGET="
-  return logoutUrl + loginUrl
+  return logoutUrl + encodeURIComponent(loginUrl)
 }
 
 function escapeHtml(html) {
