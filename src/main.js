@@ -166,7 +166,7 @@ app.post('/dev/login', withConfig, async (req, res, next) => {
   const payload = {'eraCommonsUsername': fakeUsername}
   const privateKey = req.config.data.devKeyPrivate
   const token = jwt.sign(payload, privateKey, {algorithm: 'RS256'})
-  const returnUrl = cookies['return-url'].replace('<token>', token)
+  const returnUrl = cookies['return-url'].replace('<token>', token).replace('{token}', token)
   res.send([
     '<h2>"Sign-In" Successful!</h2>',
     `<p>fake username: <b>${escapeHtml(fakeUsername)}</b></p>`,
@@ -295,7 +295,7 @@ app.post("/assert", [withSp, withIdp], bodyParser.urlencoded({extended: true}), 
       const privateKey = req.config.data.prodKeyPrivate
       const payload = {eraCommonsUsername: samlResponse.user.name_id}
       const token = jwt.sign(payload, privateKey, {algorithm: 'RS256'})
-      const returnUrl = cookies['return-url'].replace('<token>', token)
+      const returnUrl = cookies['return-url'].replace('<token>', token).replace('{token}', token)
       return redirectOrPause(res, returnUrl, token)
     } catch (e) {
       console.error(e)
