@@ -15,6 +15,6 @@ module.exports = [
   'https://terra.biodatacatalyst.nhlbi.nih.gov',
   'https://duos.broadinstitute.org',
   'https://duos.org',
-  'https://duos-k8s.dsde-staging.broadinstitute.org/',
-  'https://duos-k8s.dsde-dev.broadinstitute.org/'
+  'https://duos-k8s.dsde-staging.broadinstitute.org',
+  'https://duos-k8s.dsde-dev.broadinstitute.org'
 ]
