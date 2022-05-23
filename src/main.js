@@ -45,7 +45,7 @@ function verifyJwt(token, publicKey) {
 function oneHourFromNowJwtTime() {
   // Type is NumericDate from https://datatracker.ietf.org/doc/html/rfc7519
   // a.k.a. seconds since January 1, 1970
-  const nowInSecondsSinceEpoch = Date.now() / 1000
+  const nowInSecondsSinceEpoch = Math.floor(Date.now() / 1000)
   return nowInSecondsSinceEpoch + (60 * 60 * 1)
 }
 
