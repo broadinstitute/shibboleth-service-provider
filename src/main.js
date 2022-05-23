@@ -42,6 +42,13 @@ function verifyJwt(token, publicKey) {
   }
 }
 
+function oneHourFromNowJwtTime() {
+  // Type is NumericDate from https://datatracker.ietf.org/doc/html/rfc7519
+  // a.k.a. seconds since January 1, 1970
+  const nowInSecondsSinceEpoch = Date.now() / 1000
+  return nowInSecondsSinceEpoch + (60 * 60 * 1)
+}
+
 const app = express()
 
 app.use((req, res, next) => {
@@ -163,7 +170,7 @@ app.post('/dev/login', withConfig, async (req, res, next) => {
   const cleaned = decodeUriEncoded(body.toString(), true)
   const cookies = decodeUriEncoded(req.get('cookie'))
   const fakeUsername = cleaned.fakeUsername.length === 0 ? undefined : cleaned.fakeUsername
-  const payload = {'eraCommonsUsername': fakeUsername}
+  const payload = {'eraCommonsUsername': fakeUsername, exp: oneHourFromNowJwtTime()}
   const privateKey = req.config.data.devKeyPrivate
   const token = jwt.sign(payload, privateKey, {algorithm: 'RS256'})
   const returnUrl = cookies['return-url'].replace('<token>', token).replace('{token}', token)
@@ -293,7 +300,7 @@ app.post("/assert", [withSp, withIdp], bodyParser.urlencoded({extended: true}), 
     try {
       const cookies = decodeUriEncoded(req.get('cookie'))
       const privateKey = req.config.data.prodKeyPrivate
-      const payload = {eraCommonsUsername: samlResponse.user.name_id}
+      const payload = {eraCommonsUsername: samlResponse.user.name_id, exp: oneHourFromNowJwtTime()}
       const token = jwt.sign(payload, privateKey, {algorithm: 'RS256'})
       const returnUrl = cookies['return-url'].replace('<token>', token).replace('{token}', token)
       return redirectOrPause(res, returnUrl, token)
