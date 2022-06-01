@@ -20,7 +20,7 @@ function escapeHtml(html) {
 
 function decodeUriEncoded(s, shouldTrim = false) {
   const dec = decodeURIComponent
-  const kvs = s.split('&')
+  const kvs = s.split(/[&;]/) // '&' and ';' are both valid query delimiters
   const pairs = _.map((kv) => kv.split('='))(kvs)
   return _.fromPairs(
     _.map(([k, v]) => [dec(shouldTrim ? k.trim() : k), dec(shouldTrim ? v.trim() : v)])(pairs)
