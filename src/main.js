@@ -20,7 +20,7 @@ function escapeHtml(html) {
 
 function decodeUriEncoded(s, shouldTrim = false) {
   const dec = decodeURIComponent
-  const kvs = s.split('&')
+  const kvs = s.split(/[&;]/) // '&' and ';' are both valid query delimiters
   const pairs = _.map((kv) => kv.split('='))(kvs)
   return _.fromPairs(
     _.map(([k, v]) => [dec(shouldTrim ? k.trim() : k), dec(shouldTrim ? v.trim() : v)])(pairs)
@@ -161,12 +161,12 @@ app.get('/dev/login', (req, res, next) => {
 app.post('/dev/login', withConfig, async (req, res, next) => {
   const body = await u.consumeStreamp(req)
   const cleaned = decodeUriEncoded(body.toString(), true)
-  const cookies = decodeUriEncoded(req.get('cookie'))
+  const cookie = decodeUriEncoded(req.get('cookie'), true)
   const fakeUsername = cleaned.fakeUsername.length === 0 ? undefined : cleaned.fakeUsername
   const payload = {'eraCommonsUsername': fakeUsername}
   const privateKey = req.config.data.devKeyPrivate
   const token = jwt.sign(payload, privateKey, {algorithm: 'RS256'})
-  const returnUrl = cookies['return-url'].replace('<token>', token).replace('{token}', token)
+  const returnUrl = cookie['return-url'].replace('<token>', token).replace('{token}', token)
   res.send([
     '<h2>"Sign-In" Successful!</h2>',
     `<p>fake username: <b>${escapeHtml(fakeUsername)}</b></p>`,
@@ -291,7 +291,7 @@ app.post("/assert", [withSp, withIdp], bodyParser.urlencoded({extended: true}), 
       return res.status(500)
     }
     try {
-      const cookies = decodeUriEncoded(req.get('cookie'))
+      const cookies = decodeUriEncoded(req.get('cookie'), true)
       const privateKey = req.config.data.prodKeyPrivate
       const payload = {eraCommonsUsername: samlResponse.user.name_id}
       const token = jwt.sign(payload, privateKey, {algorithm: 'RS256'})
