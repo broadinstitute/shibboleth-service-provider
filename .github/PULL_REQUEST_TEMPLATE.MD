@@ -19,4 +19,4 @@ In all cases:
 
 - [ ] Get two thumbs worth of review and PO sign off if necessary. 
 - [ ] Squash and merge; you can delete your branch after this.
-- [ ] Test this change deployed correctly and works after deployment
+- [ ] Test this change deployed correctly and works after deployment. You can see if it has deployed with your fc account using this [link to the instance list in the gcp console](https://console.cloud.google.com/appengine/versions?serviceId=default&project=broad-shibboleth-prod). Then you can test the **dev flow** from the [prod Shibboleth instance](https://broad-shibboleth-prod.appspot.com/). To test the **prod flow**, link your NIH Account from the [Terra Profile page](https://app.terra.bio/#profile) and verify that the link expiration date gets updated.
