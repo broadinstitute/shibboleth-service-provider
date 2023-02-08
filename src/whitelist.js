@@ -1,7 +1,7 @@
 module.exports = [
   'https://broad-shibboleth-prod.appspot.com',
   'https://all-of-us-workbench-test.appspot.com',
-  'https://all-of-us-rw-staging.appspot.com',
+  'https://staging.fake-research-aou.org',
   'https://stable.fake-research-aou.org',
   'https://all-of-us-rw-perf.appspot.com',
   'https://preprod-workbench.researchallofus.org',
