@@ -1,7 +1,7 @@
 const _ = require('lodash/fp')
 const u = require('utils')
 
-const configPath = 'gs://broad-shibboleth-prod.appspot.com/configs/config.20210510a.json'
+const configPath = 'gs://broad-shibboleth-prod.appspot.com/configs/config.20230323a.json'
 
 async function fetchConfigData(authorization) {
   // console.log('fetchConfigData')
