@@ -44,6 +44,14 @@ function verifyJwt(token, publicKey) {
 
 const app = express()
 
+// middleware to set global response headers
+app.use((req, res, next) => {
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+  res.setHeader('X-Content-Type-Options', 'nosniff')
+  return next()
+})
+
+// middleware to check shibboleth url migration
 app.use((req, res, next) => {
   if (req.headers['host'] !== 'shibboleth.dsde-prod.broadinstitute.org') {
     return next()
