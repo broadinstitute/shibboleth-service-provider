@@ -8,7 +8,7 @@
     "express": "^4.18.2",
     "jsonwebtoken": "9.0.0",
     "lodash": "^4.17.21",
-    "saml2-js": "4.0.2"
+    "saml2-js": "4.0.3"
   },
   "scripts": {
     "start": "export NODE_PATH=/tmp/aelivedev/src:$PWD/src:$PWD/node_modules && node src/index.js"
