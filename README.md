@@ -90,3 +90,52 @@ tar -c --exclude='./node_modules/*' . \
 
 The Shibboleth Service Provider is hosted on Google App Engine as a single application which supports both the development and production workflows.
 Google Cloud Build deploys a new version of the application automatically when commits are merged to the `master` branch. 
+
+## Certificate Management
+
+The Shibboleth Service Provider uses two certificates to perform its SAML exchange:
+
+* Identity Provider (IdP) certificate
+* Service Provider (SP) certificate
+
+_For an explanation of Identity Provider vs. Service Provider, see https://www.okta.com/blog/identity-security/what-is-saml/._
+
+These certificates have expiration dates.
+
+**The current IdP cert is due to expire on Sep 10, 2029.**
+
+**The current SP cert is due to expire on Oct 26, 2035.**
+
+### IdP Certificate Management
+
+IdP certs are managed by the NIH, who is the Identity Provider in the SAML exchange. To update the IdP cert:
+
+1. Receive the updated cert from the NIH.
+2. Follow the additional steps at [Deploying Updated Certificates](#deploying-updated-certificates)
+
+### SP Certificate Management
+
+SP certs are managed by us, since we are the Service Provider in the SAML exchange. To update the SP cert:
+
+1. Create a new certificate using `openssl` and the [sp-cert-prod.cnf](sp-cert-prod.cnf) file in this repository:
+``` shell
+openssl req -new -x509 -nodes \
+  -newkey rsa:2048 -keyout sp-key.pem \
+  -days 3650 -config sp-cert-prod.cnf \
+  -out sp-cert.pem
+```
+2. Follow the additional steps at [Deploying Updated Certificates](#deploying-updated-certificates)
+
+
+### Deploying Updated Certificates
+
+1. `gcloud auth login` as your @firecloud.org user.
+2. Upload the updated cert to gs://broad-shibboleth-prod.appspot.com/keys, following the naming convention in that directory.
+3. Locate the current config file used by Shibboleth as defined [in code](https://github.com/broadinstitute/shibboleth-service-provider/blob/33f70ce71cb5f62574c1df8b914a0c603c3c8e65/src/config.js#L4)
+4. Download and edit the current config file to reference the cert you uploaded in step 2.
+5. Upload the edited config file to gs://broad-shibboleth-prod.appspot.com/configs, following the naming convention in that directory.
+6. Modify [the code](https://github.com/broadinstitute/shibboleth-service-provider/blob/33f70ce71cb5f62574c1df8b914a0c603c3c8e65/src/config.js#L4) to use the config file you just uploaded in step 5.
+7. Modify this README to include the new expiration date for your cert.
+8. Verify the [Dev Flow](#running-dev-flow-locally) locally as detailed earlier in this README
+9. Create and merge a PR with your code changes. Merging the PR will automatically deploy your update to production.
+10. Manually smoke-test in production.
