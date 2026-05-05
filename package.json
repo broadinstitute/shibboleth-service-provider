@@ -10,6 +10,9 @@
     "lodash": "^4.17.21",
     "saml2-js": "4.0.3"
   },
+  "overrides": {
+    "@xmldom/xmldom": "0.8.13"
+  },
   "scripts": {
     "start": "export NODE_PATH=/tmp/aelivedev/src:$PWD/src:$PWD/node_modules && node src/index.js"
   }
